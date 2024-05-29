@@ -6,13 +6,13 @@ import 'package:visualizeit_external_sort_extension/model/merge_run.dart';
 class ExternalSort<T extends Comparable<T>> {
   final List<T> fileToSort;
   final int bufferSize;
-  final int fragmentAmount;
+  final int fragmentLimit;
 
   List<List<T>> fragments = [[]];
   List<T> orderedFile = [];
   Logger logger = Logger("extension.externalsort.model");
 
-  ExternalSort(this.fileToSort, this.bufferSize, this.fragmentAmount);
+  ExternalSort(this.fileToSort, this.bufferSize, this.fragmentLimit);
 
   List<List<T>> sort() {
     validateParameters();
@@ -58,8 +58,13 @@ class ExternalSort<T extends Comparable<T>> {
           addNewKeyToIndexArray(keyToAddToBuffer, entryToWrite, indexArray,
               bufferPositionToReplace);
         } else {
-          //There's no more keys to order, so we pass the remaining keys to the fragment
+          //There's no more keys to order, so we pass the remaining keys to a new fragment
+          //If the last added to file is bigger than the first in the index array we need a new fragment
           logger.debug(() => "Remaining entries: ${indexArray.entries}");
+          if(fragments[fragmentIndex].last.compareTo(indexArray.entries.first.key) > 0){
+            fragmentIndex++;
+            fragments.add([]);
+          }
           fragments[fragmentIndex].addAll(indexArray.removeRemainingKeys());
         }
       } else {
@@ -93,9 +98,9 @@ class ExternalSort<T extends Comparable<T>> {
 
     while (currentFragments.length > 1) {
       List<List<T>> nextRuns = [];
-      for (int i = 0; i < currentFragments.length; i += fragmentAmount) {
+      for (int i = 0; i < currentFragments.length; i += fragmentLimit) {
         final batch = currentFragments.sublist(i,
-          (i + fragmentAmount > currentFragments.length) ? currentFragments.length : i + fragmentAmount);
+          (i + fragmentLimit > currentFragments.length) ? currentFragments.length : i + fragmentLimit);
         final mergedRun = MergeRun(batch).merge();
         nextRuns.add(mergedRun);
       }
