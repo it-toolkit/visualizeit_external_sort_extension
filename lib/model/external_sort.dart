@@ -67,9 +67,6 @@ class ExternalSort<T extends Comparable<T>> {
           }
           fragments[fragmentIndex].addAll(indexArray.removeRemainingKeys());
         }
-      } else {
-        //this shouldn't happen
-        throw StateError("there's no unfrozen entry in the IndexArray ");
       }
     } while (unorderedFilePointer < fileToSort.length);
 
