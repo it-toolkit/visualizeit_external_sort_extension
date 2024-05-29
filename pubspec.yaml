@@ -1,0 +1,34 @@
+name: visualizeit_external_sort_extension
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  visualizeit_extensions:
+    git: #Read only token for extensions.. Change to public URL when available
+      url: https://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@github.com/it-toolkit/visualizeit_extensions.git
+  
+  collection: ^1.18.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  dart_pre_commit: ^5.2.1
+  git_hooks: ^1.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+     - assets/docs/en.md
+     - assets/
+
+dart_pre_commit:
+  format:
+    line-length: 140
