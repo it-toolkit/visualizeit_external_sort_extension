@@ -22,16 +22,16 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
     int unsortedFilePointer = bufferSize - 1;
     List<T> buffer = fileToSort.getRange(0, bufferSize).toList();
 
-    notifyObservers(ExternalSortTransition.bufferFilled(
-        fileToSort, fragments, unsortedFilePointer));
+    notifyObservers(ExternalSortTransition<T>.bufferFilled(
+        fileToSort, fragments, buffer, unsortedFilePointer));
 
     //IndexArray initialization
     IndexArray<T> indexArray = IndexArray<T>(buffer
         .mapIndexed((index, key) => IndexArrayEntry(key, index))
         .toList());
 
-    notifyObservers(ExternalSortTransition.indexArrayBuilt(
-        fileToSort, fragments, unsortedFilePointer, indexArray));
+    notifyObservers(ExternalSortTransition<T>.indexArrayBuilt(
+        fileToSort, fragments, buffer, unsortedFilePointer, indexArray));
 
     int fragmentIndex = 0;
     do {
@@ -59,18 +59,35 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
           //Adds the key to the index array, checking to see if it needs to froze it
           addNewKeyToIndexArray(keyToAddToBuffer, entryToWrite, indexArray,
               bufferPositionToReplace);
-          notifyObservers(ExternalSortTransition.replacedEntry(fileToSort, fragments, unsortedFilePointer, indexArray, fragmentIndex, bufferPositionToReplace));
+          notifyObservers(ExternalSortTransition<T>.replacedEntry(
+              fileToSort,
+              fragments,
+              buffer,
+              unsortedFilePointer,
+              indexArray,
+              fragmentIndex,
+              bufferPositionToReplace));
         } else {
           //There's no more keys to sort, so we pass the remaining keys to a new fragment
           //If the last added to file is bigger than the first in the index array we need a new fragment
           logger.debug(() => "Remaining entries: ${indexArray.entries}");
-          if (fragments[fragmentIndex].last.compareTo(indexArray.entries.first.key) > 0) {
+          if (fragments[fragmentIndex]
+                  .last
+                  .compareTo(indexArray.entries.first.key) >
+              0) {
             fragmentIndex++;
             fragments.add([]);
-            notifyObservers(ExternalSortTransition.indexArrayFrozen(fileToSort, fragments, unsortedFilePointer, indexArray, fragmentIndex));
+            notifyObservers(ExternalSortTransition<T>.indexArrayFrozen(
+                fileToSort,
+                fragments,
+                buffer,
+                unsortedFilePointer,
+                indexArray,
+                fragmentIndex));
           }
           fragments[fragmentIndex].addAll(indexArray.removeRemainingKeys());
-          notifyObservers(ExternalSortTransition.fileToSortEnded(fileToSort, fragments));
+          notifyObservers(
+              ExternalSortTransition<T>.fileToSortEnded(fileToSort, fragments, buffer));
         }
       }
       //Checks if all entries are frozen, if they are, starts a new fragment
@@ -78,7 +95,8 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
         fragmentIndex++;
         indexArray.unfrozeAllEntries();
         fragments.add([]); //New fragment created
-        notifyObservers(ExternalSortTransition.indexArrayFrozen(fileToSort, fragments, unsortedFilePointer, indexArray, fragmentIndex));
+        notifyObservers(ExternalSortTransition<T>.indexArrayFrozen(fileToSort,
+            fragments, buffer, unsortedFilePointer, indexArray, fragmentIndex));
       }
     } while (unsortedFilePointer < fileToSort.length);
 

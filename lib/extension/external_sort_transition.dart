@@ -1,17 +1,19 @@
 import 'package:visualizeit_external_sort_extension/model/index_array.dart';
 
-class ExternalSortTransition {
+class ExternalSortTransition<T> {
   final TransitionType _type;
-  final List _fileToSort;
-  final List<List> _fragments;
+  final List<T> _fileToSort;
+  final List<List<T>> _fragments;
+  final List<T> _buffer;
   int? _unsortedFilePointer;
   int? _fragmentIndex;
   IndexArray? _indexArray;
   int? _bufferPositionToReplace;
 
   TransitionType get type => _type;
-  List get fileToSort => _fileToSort;
-  List<List> get fragments => _fragments;
+  List<T> get fileToSort => _fileToSort;
+  List<List<T>> get fragments => _fragments;
+  List<T> get buffer => _buffer;
   int? get unsortedFilePointer => _unsortedFilePointer;
   int? get fragmentIndex => _fragmentIndex;
   IndexArray? get indexArray => _indexArray;
@@ -21,23 +23,30 @@ class ExternalSortTransition {
       this._type,
       this._fileToSort,
       this._fragments,
+      this._buffer,
       this._unsortedFilePointer,
       this._fragmentIndex,
       this._indexArray,
       this._bufferPositionToReplace);
 
-  ExternalSortTransition.bufferFilled(
-      this._fileToSort, this._fragments, this._unsortedFilePointer)
+  ExternalSortTransition.bufferFilled(this._fileToSort, this._fragments,
+      this._buffer, this._unsortedFilePointer)
       : _type = TransitionType.bufferFilled;
   ExternalSortTransition.indexArrayBuilt(this._fileToSort, this._fragments,
-      this._unsortedFilePointer, this._indexArray)
+      this._buffer, this._unsortedFilePointer, this._indexArray)
       : _type = TransitionType.indexArrayBuilt;
-  ExternalSortTransition.indexArrayFrozen(this._fileToSort, this._fragments,
-      this._unsortedFilePointer, this._indexArray, this._fragmentIndex)
+  ExternalSortTransition.indexArrayFrozen(
+      this._fileToSort,
+      this._fragments,
+      this._buffer,
+      this._unsortedFilePointer,
+      this._indexArray,
+      this._fragmentIndex)
       : _type = TransitionType.indexArrayFrozen;
   ExternalSortTransition.replacedEntry(
       this._fileToSort,
       this._fragments,
+      this._buffer,
       this._unsortedFilePointer,
       this._indexArray,
       this._fragmentIndex,
@@ -46,19 +55,22 @@ class ExternalSortTransition {
   ExternalSortTransition.frozenEntry(
       this._fileToSort,
       this._fragments,
+      this._buffer,
       this._unsortedFilePointer,
       this._indexArray,
       this._fragmentIndex,
       _bufferPositionToReplace)
       : _type = TransitionType.frozenEntry;
   ExternalSortTransition.fileToSortEnded(
-      this._fileToSort,
-      this._fragments,)
-      //this._unsortedFilePointer,
-      //this._indexArray,
-      //this._fragmentIndex,
-      //_bufferPositionToReplace)
-      : _type = TransitionType.fileToSortEnded;
+    this._fileToSort,
+    this._fragments,
+    this._buffer,
+  )
+  //this._unsortedFilePointer,
+  //this._indexArray,
+  //this._fragmentIndex,
+  //_bufferPositionToReplace)
+  : _type = TransitionType.fileToSortEnded;
 }
 
 enum TransitionType {
