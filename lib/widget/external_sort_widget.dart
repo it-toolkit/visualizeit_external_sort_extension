@@ -5,8 +5,9 @@ import 'package:visualizeit_external_sort_extension/widget/unsorted_file_widget.
 
 class ExternalSortWidget extends StatefulWidget {
   final ExternalSortTransition<num> _transition;
+  final List<num> _fileToSort;
 
-  const ExternalSortWidget(this._transition, {super.key});
+  const ExternalSortWidget(this._fileToSort, this._transition, {super.key});
 
   @override
   State<ExternalSortWidget> createState() {
@@ -19,7 +20,7 @@ class _ExternalSortWidgetState extends State<ExternalSortWidget> {
 
   @override
   void initState() {
-    mapOfColors = generateColorMapFromFileToSort(widget._transition.fileToSort);
+    mapOfColors = generateColorMapFromFileToSort(widget._fileToSort);
     super.initState();
   }
 
@@ -34,7 +35,7 @@ class _ExternalSortWidgetState extends State<ExternalSortWidget> {
         ),
         Expanded(
             flex: 2,
-            child: UnsortedFileWidget(widget._transition.fileToSort,
+            child: UnsortedFileWidget(widget._fileToSort,
                 widget._transition.unsortedFilePointer, mapOfColors)),
       ],
     );

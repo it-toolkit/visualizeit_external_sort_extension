@@ -1,17 +1,21 @@
 class IndexArray<T extends Comparable<T>> {
   final List<IndexArrayEntry<T>> entries;
 
+  int get length => entries.length;
+
   IndexArray(this.entries) {
     entries.sort();
   }
+
+  bool get isEmpty => entries.isEmpty;
 
   addOrdered(T key, int bufferPosition, {bool isFrozen = false}) {
     entries.add(IndexArrayEntry(key, bufferPosition, isFrozen));
     entries.sort();
   }
 
-  bool hasUnfrozenEntries() => entries.any((entry) => !entry.isFrozen);
-  bool hasFrozenEntries() => entries.any((entry) => entry.isFrozen);
+  bool hasUnfrozenEntries() => entries.isNotEmpty && entries.any((entry) => !entry.isFrozen);
+  bool hasFrozenEntries() => entries.isNotEmpty && entries.any((entry) => entry.isFrozen);
 
   IndexArrayEntry<T>? removeFirstUnfrozen() {
     var firstUnfrozenPosition =
@@ -36,6 +40,10 @@ class IndexArray<T extends Comparable<T>> {
       entry.isFrozen = false;
     }
   }
+
+  IndexArray<T> clone() {
+    return IndexArray(entries.map((e) => e.clone()).toList());
+  }
 }
 
 class IndexArrayEntry<T extends Comparable<T>>
@@ -59,5 +67,9 @@ class IndexArrayEntry<T extends Comparable<T>>
   @override
   String toString() {
     return "[ $key | $bufferPosition | ${isFrozen ? "Frozen" : ""} ]";
+  }
+  
+  IndexArrayEntry<T> clone() {
+    return IndexArrayEntry<T>(key, bufferPosition, isFrozen);
   }
 }

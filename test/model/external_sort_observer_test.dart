@@ -37,7 +37,7 @@ void main() {
         202
       ];
       var externalsort = ExternalSort<num>(valuesToSort, 5, 3);
-      var observer = ExternalSortObserver();
+      var observer = ExternalSortObserver<num>();
       externalsort.registerObserver(observer);
       externalsort.sort();
 

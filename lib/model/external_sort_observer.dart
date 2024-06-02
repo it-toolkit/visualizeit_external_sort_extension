@@ -1,6 +1,6 @@
 import 'package:visualizeit_external_sort_extension/extension/external_sort_transition.dart';
 
-class ExternalSortObserver<T> {
+class ExternalSortObserver<T extends Comparable<T>> {
   final List<ExternalSortTransition<T>> _transitions = [];
 
   List<ExternalSortTransition<T>> get transitions => _transitions;

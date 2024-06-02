@@ -23,7 +23,9 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
     List<T> buffer = fileToSort.getRange(0, bufferSize).toList();
 
     notifyObservers(ExternalSortTransition<T>.bufferFilled(
-        fileToSort, fragments, buffer, unsortedFilePointer));
+        fragments.map((e) => List.of(e)).toList(),
+        List.of(buffer),
+        unsortedFilePointer));
 
     //IndexArray initialization
     IndexArray<T> indexArray = IndexArray<T>(buffer
@@ -31,7 +33,10 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
         .toList());
 
     notifyObservers(ExternalSortTransition<T>.indexArrayBuilt(
-        fileToSort, fragments, buffer, unsortedFilePointer, indexArray));
+        fragments.map((e) => List.of(e)).toList(),
+        List.of(buffer),
+        unsortedFilePointer,
+        indexArray.clone()));
 
     int fragmentIndex = 0;
     do {
@@ -53,6 +58,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
           var keyToAddToBuffer = fileToSort[unsortedFilePointer];
           logger.debug(() => "new key to add to the buffer: $keyToAddToBuffer");
 
+          
           //Replaces the entry in the buffer with the new key
           buffer[bufferPositionToReplace] = keyToAddToBuffer;
 
@@ -60,11 +66,10 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
           addNewKeyToIndexArray(keyToAddToBuffer, entryToWrite, indexArray,
               bufferPositionToReplace);
           notifyObservers(ExternalSortTransition<T>.replacedEntry(
-              fileToSort,
-              fragments,
-              buffer,
+              fragments.map((e) => List.of(e)).toList(),
+              List.of(buffer),
               unsortedFilePointer,
-              indexArray,
+              indexArray.clone(),
               fragmentIndex,
               bufferPositionToReplace));
         } else {
@@ -78,25 +83,28 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
             fragmentIndex++;
             fragments.add([]);
             notifyObservers(ExternalSortTransition<T>.indexArrayFrozen(
-                fileToSort,
-                fragments,
-                buffer,
+                fragments.map((e) => List.of(e)).toList(),
+                List.of(buffer),
                 unsortedFilePointer,
-                indexArray,
+                indexArray.clone(),
                 fragmentIndex));
           }
           fragments[fragmentIndex].addAll(indexArray.removeRemainingKeys());
-          notifyObservers(
-              ExternalSortTransition<T>.fileToSortEnded(fileToSort, fragments, buffer));
+          notifyObservers(ExternalSortTransition<T>.fileToSortEnded(
+              fragments.map((e) => List.of(e)).toList(), List.of(buffer)));
         }
       }
       //Checks if all entries are frozen, if they are, starts a new fragment
-      if (!indexArray.hasUnfrozenEntries()) {
+      if (!indexArray.isEmpty && !indexArray.hasUnfrozenEntries()) {
         fragmentIndex++;
         indexArray.unfrozeAllEntries();
         fragments.add([]); //New fragment created
-        notifyObservers(ExternalSortTransition<T>.indexArrayFrozen(fileToSort,
-            fragments, buffer, unsortedFilePointer, indexArray, fragmentIndex));
+        notifyObservers(ExternalSortTransition<T>.indexArrayFrozen(
+            fragments.map((e) => List.of(e)).toList(),
+            List.of(buffer),
+            unsortedFilePointer,
+            indexArray.clone(),
+            fragmentIndex));
       }
     } while (unsortedFilePointer < fileToSort.length);
 
