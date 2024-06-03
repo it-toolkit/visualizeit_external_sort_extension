@@ -16,6 +16,7 @@ dependencies:
       url: https://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@github.com/it-toolkit/visualizeit_extensions.git
   
   collection: ^1.18.0
+  uuid: ^4.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

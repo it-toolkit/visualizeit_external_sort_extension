@@ -15,6 +15,8 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
   Logger logger = Logger("extension.externalsort.model");
 
   ExternalSort(this.fileToSort, this.bufferSize, this.fragmentLimit);
+  ExternalSort._copy(this.fileToSort, this.bufferSize, this.fragmentLimit,
+      this.fragments, this.orderedFile);
 
   List<List<T>> sort() {
     validateParameters();
@@ -58,7 +60,6 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
           var keyToAddToBuffer = fileToSort[unsortedFilePointer];
           logger.debug(() => "new key to add to the buffer: $keyToAddToBuffer");
 
-          
           //Replaces the entry in the buffer with the new key
           buffer[bufferPositionToReplace] = keyToAddToBuffer;
 
@@ -157,5 +158,10 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
     if (bufferSize > fileToSort.length) {
       throw ArgumentError("file length should be greater than buffer size");
     }
+  }
+
+  ExternalSort<T> clone() {
+    return ExternalSort<T>._copy(
+        fileToSort, bufferSize, fragmentLimit, fragments, orderedFile);
   }
 }
