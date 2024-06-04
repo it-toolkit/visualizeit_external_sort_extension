@@ -4,6 +4,10 @@ import 'package:visualizeit_extensions/extension.dart';
 import 'package:visualizeit_extensions/logging.dart';
 import 'package:visualizeit_extensions/scripting.dart';
 import 'package:visualizeit_extensions/visualizer.dart';
+import 'package:visualizeit_external_sort_extension/extension/external_sort_builder_command.dart';
+import 'package:visualizeit_external_sort_extension/extension/external_sort_command.dart';
+import 'package:visualizeit_external_sort_extension/extension/external_sort_model.dart';
+import 'package:visualizeit_external_sort_extension/widget/external_sort_widget.dart';
 
 final _logger = Logger("extension.externalsort");
 
@@ -14,7 +18,7 @@ class ExternalSortExtensionBuilder extends ExtensionBuilder {
 
   @override
   Future<Extension> build() async {
-    _logger.trace(() => "Building B# Tree extension");
+    _logger.trace(() => "Building External Sort extension");
     var extension = ExternalSortExtension();
 
     final markdownDocs = {
@@ -31,10 +35,19 @@ class ExternalSortExtension extends DefaultScriptingExtension
     implements ScriptingExtension, VisualizerExtension {
   static const extensionId = "externalsort-extension";
 
-  ExternalSortExtension() : super({});
+  ExternalSortExtension()
+      : super({
+          ExternalSortBuilderCommand.commandDefinition:
+              ExternalSortBuilderCommand.build,
+          SortCommand.commandDefinition: SortCommand.build,
+        });
   @override
   Widget? render(Model model, BuildContext context) {
-    // TODO: implement render
-    throw UnimplementedError();
+    if (model is ExternalSortModel) {
+      return ExternalSortWidget(
+          model.fileToSort, model.bufferSize, model.currentTransition);
+    } else {
+      return null;
+    }
   }
 }

@@ -91,8 +91,9 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
                 fragmentIndex));
           }
           fragments[fragmentIndex].addAll(indexArray.removeRemainingKeys());
+          buffer = [];
           notifyObservers(ExternalSortTransition<T>.fileToSortEnded(
-              fragments.map((e) => List.of(e)).toList(), List.of(buffer)));
+              fragments.map((e) => List.of(e)).toList()));
         }
       }
       //Checks if all entries are frozen, if they are, starts a new fragment

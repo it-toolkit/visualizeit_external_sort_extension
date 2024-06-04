@@ -4,10 +4,12 @@ import 'package:visualizeit_external_sort_extension/extension/external_sort_tran
 import 'package:visualizeit_external_sort_extension/model/index_array.dart';
 
 class SortProcessWidget extends StatefulWidget {
-  final ExternalSortTransition<num> _transition;
+  final ExternalSortTransition<num>? _transition;
+  final int _bufferSize;
   final Map<num, Color> mapOfColors;
 
-  const SortProcessWidget(this._transition, this.mapOfColors, {super.key});
+  const SortProcessWidget(this._transition, this._bufferSize, this.mapOfColors,
+      {super.key});
 
   @override
   State<SortProcessWidget> createState() => _SortProcessWidgetState();
@@ -23,29 +25,31 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
-          children: buildBuffer(widget._transition.buffer,
-              widget._transition.bufferPositionToReplace),
+          children: buildBuffer(widget._bufferSize, widget._transition?.buffer,
+              widget._transition?.bufferPositionToReplace),
         ),
         Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: buildIndexArray(
-                widget._transition.buffer,
-                widget._transition.indexArray,
-                widget._transition.bufferPositionToReplace)),
+                widget._bufferSize,
+                widget._transition?.buffer,
+                widget._transition?.indexArray,
+                widget._transition?.bufferPositionToReplace)),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: buildFragments(
-              widget._transition.fragments, widget._transition.fragmentIndex),
+              widget._transition?.fragments, widget._transition?.fragmentIndex),
         )
       ],
     );
   }
 
-  List<Widget> buildBuffer(List<num> buffer, int? bufferPositionToReplace) {
+  List<Widget> buildBuffer(
+      int bufferSize, List<num>? buffer, int? bufferPositionToReplace) {
     List<Widget> bufferComponents = [];
     bufferComponents.add(Container(
       width: 105.0,
@@ -64,50 +68,26 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             shrinkWrap: true,
-            itemCount: buffer.length,
+            itemCount: bufferSize,
             itemBuilder: (context, index) =>
-                bufferValueBuider(buffer, index, bufferPositionToReplace),
+                bufferValueBuider(bufferSize, buffer, index, bufferPositionToReplace),
           )),
     );
 
     return bufferComponents;
   }
 
-  List<Widget> buildIndexArray(List<num> buffer, IndexArray<num>? indexArray,
+  Widget bufferValueBuider(int bufferSize, List<num>? buffer, int index,
       int? bufferPositionToReplace) {
-    List<Widget> indexArrayComponents = [];
-
-    indexArrayComponents.add(Container(
-      margin: const EdgeInsets.all(10),
-      width: 105.0,
-      alignment: Alignment.centerRight,
-      child: const Text(
-        "Index Array",
-        style: TextStyle(fontSize: 20.0),
-      ),
-    ));
-
-    indexArrayComponents.add(
-      Container(
-          height: 72,
-          margin: const EdgeInsets.all(10),
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            itemCount: buffer.length,
-            itemBuilder: (context, index) => indexArrayValueBuider(
-                buffer, indexArray, index, bufferPositionToReplace),
-          )),
-    );
-
-    return indexArrayComponents;
-  }
-
-  Widget bufferValueBuider(
-      List<num> buffer, int index, int? bufferPositionToReplace) {
-    var numToShow = buffer[index];
-    Container bufferBox = buildColoredBox(index, numToShow.toString(),
-        widget.mapOfColors[numToShow]!, bufferPositionToReplace);
+    var numToShow = " ";
+    Color backgroundColor = Colors.white;
+    if(buffer!= null){
+      numToShow = buffer[index].toString();
+      backgroundColor = widget.mapOfColors[buffer[index]]!;
+    }
+    
+    Container bufferBox = buildColoredBox(index, numToShow,
+        backgroundColor, bufferPositionToReplace);
 
     return Container(
       width: 40,
@@ -129,6 +109,35 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
         subtitle: bufferBox,
       ),
     );
+  }
+
+  List<Widget> buildIndexArray(int bufferSize, List<num>? buffer, IndexArray<num>? indexArray,
+      int? bufferPositionToReplace) {
+    List<Widget> indexArrayComponents = [];
+
+    indexArrayComponents.add(Container(
+      margin: const EdgeInsets.all(10),
+      width: 105.0,
+      alignment: Alignment.centerRight,
+      child: const Text(
+        "Index Array",
+        style: TextStyle(fontSize: 20.0),
+      ),
+    ));
+
+      indexArrayComponents.add(
+        Container(
+            height: 72,
+            margin: const EdgeInsets.all(10),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemCount: bufferSize,
+              itemBuilder: (context, index) => indexArrayValueBuider(indexArray, index, bufferPositionToReplace),
+            )),
+      );
+
+    return indexArrayComponents;
   }
 
   Container buildColoredBox(int index, String numToShow, Color backgroundColor,
@@ -168,7 +177,7 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
     return coloredBox;
   }
 
-  Widget indexArrayValueBuider(List<num> buffer, IndexArray<num>? indexArray,
+  Widget indexArrayValueBuider( IndexArray<num>? indexArray,
       int index, int? bufferPositionToReplace) {
     var maybeEntry = indexArray?.entries.elementAt(index);
     var bufferPosition = maybeEntry?.bufferPosition;
@@ -182,13 +191,13 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
 
     int? positionToHighlight;
 
-    if (bufferPosition!= null && bufferPosition == bufferPositionToReplace) {
+    if (bufferPosition != null && bufferPosition == bufferPositionToReplace) {
       positionToHighlight = index;
     }
 
     var indexBox = buildColoredBox(
       index,
-      bufferPosition != null ? bufferPosition.toString() : "",
+      bufferPosition != null ? bufferPosition.toString() : " ",
       indexBoxColor,
     );
 
@@ -201,7 +210,7 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
 
     var indexArrayValue = buildColoredBox(
         index,
-        key != null ? key.toString() : "",
+        key != null ? key.toString() : " ",
         indexArrayValueBoxColor,
         positionToHighlight);
 
@@ -220,7 +229,8 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
     );
   }
 
-  List<Widget> buildFragments(List<List<num>> fragments, int? currentFragment) {
+  List<Widget> buildFragments(
+      List<List<num>>? fragments, int? currentFragment) {
     List<Widget> fragmentsComponent = [];
 
     fragmentsComponent.add(Container(
@@ -233,19 +243,25 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
       ),
     ));
 
-    var fragmentsContainer = Container(
-      decoration: BoxDecoration(border: Border.all()),
-      padding: const EdgeInsets.only(right: 5.0),
-      margin: const EdgeInsets.only(left: 10, top: 10),
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: fragments
-              .mapIndexed((index, fragment) =>
-                  buildFragmentRow(index, fragment, currentFragment))
-              .toList()),
-    );
-    fragmentsComponent.add(fragmentsContainer);
+    List<Widget> fragmentsRow = [buildFragmentRow(0, [], 0)];
+    if(fragments != null ){
+      fragmentsRow = fragments
+                .mapIndexed((index, fragment) =>
+                    buildFragmentRow(index, fragment, currentFragment))
+                .toList();
+    }
+
+      var fragmentsContainer = Container(
+        constraints: const BoxConstraints(minWidth: 100, minHeight: 100),
+        decoration: BoxDecoration(border: Border.all()),
+        padding: const EdgeInsets.only(right: 5.0),
+        margin: const EdgeInsets.only(left: 10, top: 10),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: fragmentsRow,
+      ));
+      fragmentsComponent.add(fragmentsContainer);
 
     return fragmentsComponent;
   }

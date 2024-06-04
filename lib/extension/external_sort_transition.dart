@@ -3,7 +3,7 @@ import 'package:visualizeit_external_sort_extension/model/index_array.dart';
 class ExternalSortTransition<T extends Comparable<T>> {
   final TransitionType _type;
   final List<List<T>> _fragments;
-  final List<T> _buffer;
+  List<T>? _buffer;
   int? _unsortedFilePointer;
   int? _fragmentIndex;
   IndexArray<T>? _indexArray;
@@ -11,7 +11,7 @@ class ExternalSortTransition<T extends Comparable<T>> {
 
   TransitionType get type => _type;
   List<List<T>> get fragments => _fragments;
-  List<T> get buffer => _buffer;
+  List<T>? get buffer => _buffer;
   int? get unsortedFilePointer => _unsortedFilePointer;
   int? get fragmentIndex => _fragmentIndex;
   IndexArray<T>? get indexArray => _indexArray;
@@ -57,7 +57,6 @@ class ExternalSortTransition<T extends Comparable<T>> {
       : _type = TransitionType.frozenEntry;
   ExternalSortTransition.fileToSortEnded(
     this._fragments,
-    this._buffer,
   ): _type = TransitionType.fileToSortEnded;
 
   @override

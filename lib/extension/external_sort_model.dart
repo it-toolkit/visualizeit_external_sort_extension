@@ -7,13 +7,16 @@ import 'package:visualizeit_external_sort_extension/model/external_sort_observer
 
 class ExternalSortModel extends Model {
   final ExternalSort<num> _externalSort;
-  List<ExternalSortTransition> _transitions = [];
+  List<ExternalSortTransition<num>> _transitions = [];
   ExternalSortCommand? commandInExecution;
   int _currentFrame = 0;
 
-  ExternalSortTransition? get currentTransition =>
+  ExternalSortTransition<num>? get currentTransition =>
       _transitions.isNotEmpty ? _transitions[_currentFrame] : null;
   int get _pendingFrames => _transitions.length - _currentFrame - 1;
+
+  List<num> get fileToSort => _externalSort.fileToSort;
+  int get bufferSize => _externalSort.bufferSize;
 
   ExternalSortModel(
       String name, int bufferSize, int fragmentLimit, List<int> fileToSort)

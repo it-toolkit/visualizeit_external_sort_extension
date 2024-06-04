@@ -5,7 +5,8 @@ class UnsortedFileWidget extends StatefulWidget {
   final int? unsortedFilePointer;
   final Map<num, Color> mapOfColors;
 
-  const UnsortedFileWidget(this.fileToSort, this.unsortedFilePointer, this.mapOfColors,
+  const UnsortedFileWidget(
+      this.fileToSort, this.unsortedFilePointer, this.mapOfColors,
       {super.key});
 
   @override
@@ -15,27 +16,67 @@ class UnsortedFileWidget extends StatefulWidget {
 }
 
 class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
+  late ScrollController _scrollController;
+
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    double initialOffSet = 0.0;
+    if (widget.unsortedFilePointer != null) {
+      initialOffSet = widget.unsortedFilePointer!.toDouble();
+    }
+    _scrollController = ScrollController(
+        initialScrollOffset: initialOffSet, keepScrollOffset: false);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> rows = [];
-    rows.add(Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Container(
-          constraints: const BoxConstraints(maxWidth: 80, maxHeight: 50),
-          child: const Text("File to Order"),
-        )
-      ],
-    ));
+    rows.add(
+      const SizedBox(
+        height: 25,
+        width: 80,
+        child: Text("File to Order"),
+      ),
+    );
 
-    rows.addAll(buildValueBox(widget.fileToSort, widget.unsortedFilePointer));
+    rows.add(
+      Expanded(
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children:
+                buildValueBox(widget.fileToSort, widget.unsortedFilePointer),
+          ),
+        ),
+      ),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+    if (widget.unsortedFilePointer != null) {
+      var position = widget.unsortedFilePointer!.toDouble();
+      //TODO mejorar esta logica
+      if(position > 8.0){
+        _scrollController.animateTo(position * 25, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
+      }
+    }
+    });
+
+    
     return Column(
       children: rows,
     );
@@ -45,7 +86,6 @@ class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
     List<Widget> valueBoxes = [];
 
     for (var i = 0; i < fileToSort.length; i++) {
-
       var borderColor = Colors.black;
       var textColor = Colors.black;
       var fontWeight = FontWeight.normal;
@@ -59,49 +99,21 @@ class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
         containerWidth = 90;
       }
 
-      valueBoxes.add(Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: containerWidth,
-            height: 25,
-            margin: const EdgeInsets.fromLTRB(10, 1, 10, 1),
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(color: borderColor, width: borderWidth),
-              color: widget.mapOfColors[fileToSort[i]]
-            ),
-            child: Text(
-              fileToSort[i].toString(),
-              style: TextStyle(color: textColor, fontWeight: fontWeight),
-            ),
-          )
-        ],
+      valueBoxes.add(Container(
+        width: containerWidth,
+        height: 25,
+        margin: const EdgeInsets.fromLTRB(30, 1, 30, 1),
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            border: Border.all(color: borderColor, width: borderWidth),
+            color: widget.mapOfColors[fileToSort[i]]),
+        child: Text(
+          fileToSort[i].toString(),
+          style: TextStyle(color: textColor, fontWeight: fontWeight),
+        ),
       ));
     }
-
-    /*for (var element in fileToSort) {
-      valueBoxes.add(Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Container(
-            width: 80,
-            height: 20,
-            margin: const EdgeInsets.fromLTRB(10, 1, 10, 1),
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(),
-              color: getColorFromValue(element, fileToSort.length),
-            ),
-            child: Text(element.toString()),
-          )
-        ],
-      ));
-    }*/
     return valueBoxes;
   }
-
 }

@@ -4,10 +4,12 @@ import 'package:visualizeit_external_sort_extension/widget/sort_process_widget.d
 import 'package:visualizeit_external_sort_extension/widget/unsorted_file_widget.dart';
 
 class ExternalSortWidget extends StatefulWidget {
-  final ExternalSortTransition<num> _transition;
+  final ExternalSortTransition<num>? _transition;
   final List<num> _fileToSort;
+  final int _bufferSize;
 
-  const ExternalSortWidget(this._fileToSort, this._transition, {super.key});
+  const ExternalSortWidget(this._fileToSort, this._bufferSize, this._transition,
+      {super.key});
 
   @override
   State<ExternalSortWidget> createState() {
@@ -31,12 +33,12 @@ class _ExternalSortWidgetState extends State<ExternalSortWidget> {
       children: [
         Expanded(
           flex: 8,
-          child: SortProcessWidget(widget._transition, mapOfColors),
+          child: SortProcessWidget(widget._transition, widget._bufferSize, mapOfColors),
         ),
         Expanded(
             flex: 2,
             child: UnsortedFileWidget(widget._fileToSort,
-                widget._transition.unsortedFilePointer, mapOfColors)),
+                widget._transition?.unsortedFilePointer, mapOfColors)),
       ],
     );
   }
