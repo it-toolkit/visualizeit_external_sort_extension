@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: InteractiveViewer(
           clipBehavior: Clip.none,
-          child: ExternalSortWidget(fileToSort, bufferSize, null),
+          child: ExternalSortWidget(fileToSort, bufferSize, transition),
         ),
       ),
     );

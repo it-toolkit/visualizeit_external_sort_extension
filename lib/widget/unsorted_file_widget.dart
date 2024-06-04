@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class UnsortedFileWidget extends StatefulWidget {
@@ -17,11 +18,7 @@ class UnsortedFileWidget extends StatefulWidget {
 
 class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
   late ScrollController _scrollController;
-
-  @override
-  void setState(VoidCallback fn) {
-    super.setState(fn);
-  }
+  bool _highlighted = false;
 
   @override
   void initState() {
@@ -32,6 +29,9 @@ class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
     }
     _scrollController = ScrollController(
         initialScrollOffset: initialOffSet, keepScrollOffset: false);
+    Future.delayed(const Duration(seconds: 0)).then((value) => setState(() {
+          _highlighted = true;
+        }));
   }
 
   @override
@@ -99,14 +99,16 @@ class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
         containerWidth = 90;
       }
 
-      valueBoxes.add(Container(
-        width: containerWidth,
+      valueBoxes.add(AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.ease,
+        width: _highlighted ? containerWidth : 80,
         height: 25,
         margin: const EdgeInsets.fromLTRB(30, 1, 30, 1),
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            border: Border.all(color: borderColor, width: borderWidth),
+            border: Border.all(color:_highlighted ? borderColor : Colors.black, width:_highlighted ? borderWidth : 1.0),
             color: widget.mapOfColors[fileToSort[i]]),
         child: Text(
           fileToSort[i].toString(),

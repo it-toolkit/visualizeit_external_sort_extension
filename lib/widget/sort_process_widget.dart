@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_transition.dart';
 import 'package:visualizeit_external_sort_extension/model/index_array.dart';
+import 'package:visualizeit_external_sort_extension/widget/colored_box.dart';
 
 class SortProcessWidget extends StatefulWidget {
   final ExternalSortTransition<num>? _transition;
@@ -69,8 +70,8 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
             scrollDirection: Axis.horizontal,
             shrinkWrap: true,
             itemCount: bufferSize,
-            itemBuilder: (context, index) =>
-                bufferValueBuider(bufferSize, buffer, index, bufferPositionToReplace),
+            itemBuilder: (context, index) => bufferValueBuider(
+                bufferSize, buffer, index, bufferPositionToReplace),
           )),
     );
 
@@ -81,13 +82,14 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
       int? bufferPositionToReplace) {
     var numToShow = " ";
     Color backgroundColor = Colors.white;
-    if(buffer!= null){
+    if (buffer != null) {
       numToShow = buffer[index].toString();
       backgroundColor = widget.mapOfColors[buffer[index]]!;
     }
-    
-    Container bufferBox = buildColoredBox(index, numToShow,
-        backgroundColor, bufferPositionToReplace);
+
+    ColoredValueBox bufferBox = ColoredValueBox(
+        index, numToShow, backgroundColor,
+        positionToHighlight: bufferPositionToReplace);
 
     return Container(
       width: 40,
@@ -111,8 +113,8 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
     );
   }
 
-  List<Widget> buildIndexArray(int bufferSize, List<num>? buffer, IndexArray<num>? indexArray,
-      int? bufferPositionToReplace) {
+  List<Widget> buildIndexArray(int bufferSize, List<num>? buffer,
+      IndexArray<num>? indexArray, int? bufferPositionToReplace) {
     List<Widget> indexArrayComponents = [];
 
     indexArrayComponents.add(Container(
@@ -125,60 +127,24 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
       ),
     ));
 
-      indexArrayComponents.add(
-        Container(
-            height: 72,
-            margin: const EdgeInsets.all(10),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemCount: bufferSize,
-              itemBuilder: (context, index) => indexArrayValueBuider(indexArray, index, bufferPositionToReplace),
-            )),
-      );
+    indexArrayComponents.add(
+      Container(
+          height: 72,
+          margin: const EdgeInsets.all(10),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
+            itemCount: bufferSize,
+            itemBuilder: (context, index) => indexArrayValueBuider(
+                indexArray, index, bufferPositionToReplace),
+          )),
+    );
 
     return indexArrayComponents;
   }
 
-  Container buildColoredBox(int index, String numToShow, Color backgroundColor,
-      [int? positionToEnhance]) {
-    var borderColor = Colors.black;
-    var textColor = Colors.black;
-    var fontWeight = FontWeight.normal;
-    double containerHeight = 40;
-    double containerWidth = 40;
-    var borderWidth = 1.0;
-
-    if (positionToEnhance != null && positionToEnhance == index) {
-      borderColor = Colors.blueGrey;
-      textColor = Colors.white;
-      borderWidth = 2.0;
-      fontWeight = FontWeight.bold;
-      containerHeight = 50;
-      containerWidth = 50;
-    }
-
-    var coloredBox = Container(
-      width: containerWidth,
-      height: containerHeight,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        border: Border.all(color: borderColor, width: borderWidth),
-        color: backgroundColor,
-      ),
-      child: FittedBox(
-        fit: BoxFit.fitWidth,
-        child: Text(
-          numToShow,
-          style: TextStyle(color: textColor, fontWeight: fontWeight),
-        ),
-      ),
-    );
-    return coloredBox;
-  }
-
-  Widget indexArrayValueBuider( IndexArray<num>? indexArray,
-      int index, int? bufferPositionToReplace) {
+  Widget indexArrayValueBuider(
+      IndexArray<num>? indexArray, int index, int? bufferPositionToReplace) {
     var maybeEntry = indexArray?.entries.elementAt(index);
     var bufferPosition = maybeEntry?.bufferPosition;
     var key = maybeEntry?.key;
@@ -195,7 +161,7 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
       positionToHighlight = index;
     }
 
-    var indexBox = buildColoredBox(
+    var indexBox = ColoredValueBox(
       index,
       bufferPosition != null ? bufferPosition.toString() : " ",
       indexBoxColor,
@@ -208,11 +174,9 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
       }
     }
 
-    var indexArrayValue = buildColoredBox(
-        index,
-        key != null ? key.toString() : " ",
-        indexArrayValueBoxColor,
-        positionToHighlight);
+    var indexArrayValue = ColoredValueBox(
+        index, key != null ? key.toString() : " ", indexArrayValueBoxColor,
+        positionToHighlight: positionToHighlight);
 
     return Container(
       width: 40,
@@ -244,24 +208,24 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
     ));
 
     List<Widget> fragmentsRow = [buildFragmentRow(0, [], 0)];
-    if(fragments != null ){
+    if (fragments != null) {
       fragmentsRow = fragments
-                .mapIndexed((index, fragment) =>
-                    buildFragmentRow(index, fragment, currentFragment))
-                .toList();
+          .mapIndexed((index, fragment) =>
+              buildFragmentRow(index, fragment, currentFragment))
+          .toList();
     }
 
-      var fragmentsContainer = Container(
+    var fragmentsContainer = Container(
         constraints: const BoxConstraints(minWidth: 100, minHeight: 100),
         decoration: BoxDecoration(border: Border.all()),
         padding: const EdgeInsets.only(right: 5.0),
         margin: const EdgeInsets.only(left: 10, top: 10),
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: fragmentsRow,
-      ));
-      fragmentsComponent.add(fragmentsContainer);
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: fragmentsRow,
+        ));
+    fragmentsComponent.add(fragmentsContainer);
 
     return fragmentsComponent;
   }
@@ -283,9 +247,8 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
             style: textStyle,
           ),
         ),
-        Container(
+        SizedBox(
             height: 50,
-            //padding: const EdgeInsets.only(top: 5.0),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
@@ -300,7 +263,7 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
   Widget fragmentValueBuider(
       List<num> fragment, int? currentFragment, int index) {
     var numToShow = fragment[index];
-    Container fragmentBox = buildColoredBox(
+    var fragmentBox = ColoredValueBox(
         index, numToShow.toString(), widget.mapOfColors[numToShow]!);
 
     return Container(
