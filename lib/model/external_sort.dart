@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:visualizeit_extensions/logging.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_transition.dart';
-import 'package:visualizeit_external_sort_extension/model/external_sort_observer.dart';
 import 'package:visualizeit_external_sort_extension/model/index_array.dart';
 import 'package:visualizeit_external_sort_extension/model/merge_run.dart';
 import 'package:visualizeit_external_sort_extension/model/observable.dart';
