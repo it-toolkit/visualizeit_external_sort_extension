@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_transition.dart';
+import 'package:visualizeit_external_sort_extension/widget/colors_map_mixin.dart';
+import 'package:visualizeit_external_sort_extension/widget/merge_process_widget.dart';
 import 'package:visualizeit_external_sort_extension/widget/sort_process_widget.dart';
 import 'package:visualizeit_external_sort_extension/widget/unsorted_file_widget.dart';
 
@@ -7,8 +9,9 @@ class ExternalSortWidget extends StatefulWidget {
   final ExternalSortTransition<num>? _transition;
   final List<num> _fileToSort;
   final int _bufferSize;
+  final int _fragmentLimit;
 
-  const ExternalSortWidget(this._fileToSort, this._bufferSize, this._transition,
+  const ExternalSortWidget(this._fileToSort, this._bufferSize, this._fragmentLimit, this._transition,
       {super.key});
 
   @override
@@ -17,7 +20,7 @@ class ExternalSortWidget extends StatefulWidget {
   }
 }
 
-class _ExternalSortWidgetState extends State<ExternalSortWidget> {
+class _ExternalSortWidgetState extends State<ExternalSortWidget> with ColorsMapMixin{
   late Map<num, Color> mapOfColors;
 
   @override
@@ -28,36 +31,33 @@ class _ExternalSortWidgetState extends State<ExternalSortWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Widget processWidget;
+    var transition = widget._transition;
+    int? unsortedFilePointer;
+    if (transition != null) {
+      if(transition is SortTransition<num>){
+        unsortedFilePointer = transition.unsortedFilePointer;
+        processWidget = SortProcessWidget(transition, widget._bufferSize, mapOfColors);
+      } else {
+        processWidget = MergeProcessWidget(transition as MergeTransition<num>, widget._fragmentLimit, mapOfColors);
+      }
+    } else {
+      processWidget = SortProcessWidget(null, widget._bufferSize, mapOfColors);
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Expanded(
           flex: 8,
-          child: SortProcessWidget(widget._transition, widget._bufferSize, mapOfColors),
+          child: processWidget,
         ),
         Expanded(
             flex: 2,
-            child: UnsortedFileWidget(widget._fileToSort,
-                widget._transition?.unsortedFilePointer, mapOfColors)),
+            child: UnsortedFileWidget(widget._fileToSort, mapOfColors,
+                unsortedFilePointer)),
       ],
     );
-  }
-
-  Map<num, Color> generateColorMapFromFileToSort(List<num> fileToSort) {
-    List<int> indices = List.generate(fileToSort.length, (index) => index);
-    indices.sort((a, b) => fileToSort[a].compareTo(fileToSort[b]));
-
-    int totalCount = fileToSort.length;
-    int maxHue = 345;
-    int startHue = -11;
-    Map<num, Color> valueToColorMap = {};
-
-    for (int i = 0; i < totalCount; i++) {
-      double hueValue = ((i * maxHue) / (totalCount - 1) + startHue) % 360;
-      HSLColor hslColor = HSLColor.fromAHSL(1.0, hueValue, 0.9, 0.57);
-      valueToColorMap[fileToSort[indices[i]]] = hslColor.toColor();
-    }
-
-    return valueToColorMap;
   }
 }

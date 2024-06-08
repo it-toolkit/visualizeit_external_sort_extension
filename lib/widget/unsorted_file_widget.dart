@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class UnsortedFileWidget extends StatefulWidget {
@@ -6,9 +5,9 @@ class UnsortedFileWidget extends StatefulWidget {
   final int? unsortedFilePointer;
   final Map<num, Color> mapOfColors;
 
-  const UnsortedFileWidget(
-      this.fileToSort, this.unsortedFilePointer, this.mapOfColors,
-      {super.key});
+  const UnsortedFileWidget(this.fileToSort, this.mapOfColors,
+      [this.unsortedFilePointer, key])
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -66,17 +65,17 @@ class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-    if (widget.unsortedFilePointer != null) {
-      var position = widget.unsortedFilePointer!.toDouble();
-      //TODO mejorar esta logica
-      if(position > 8.0){
-        _scrollController.animateTo(position * 25, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
+      if (widget.unsortedFilePointer != null) {
+        var position = widget.unsortedFilePointer!.toDouble();
+        //TODO mejorar esta logica
+        if (position > 8.0) {
+          _scrollController.animateTo(position * 25,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut);
+        }
       }
-    }
     });
 
-    
     return Column(
       children: rows,
     );
@@ -108,7 +107,9 @@ class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-            border: Border.all(color:_highlighted ? borderColor : Colors.black, width:_highlighted ? borderWidth : 1.0),
+            border: Border.all(
+                color: _highlighted ? borderColor : Colors.black,
+                width: _highlighted ? borderWidth : 1.0),
             color: widget.mapOfColors[fileToSort[i]]),
         child: Text(
           fileToSort[i].toString(),

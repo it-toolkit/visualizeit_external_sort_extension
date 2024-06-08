@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:visualizeit_extensions/logging.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_transition.dart';
+import 'package:visualizeit_external_sort_extension/model/external_sort_observer.dart';
 import 'package:visualizeit_external_sort_extension/model/index_array.dart';
 import 'package:visualizeit_external_sort_extension/model/merge_run.dart';
 import 'package:visualizeit_external_sort_extension/model/observable.dart';
@@ -11,12 +12,12 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
   final int fragmentLimit;
 
   List<List<T>> fragments = [[]];
-  List<T> orderedFile = [];
+  List<T> sortedFile = [];
   Logger logger = Logger("extension.externalsort.model");
 
   ExternalSort(this.fileToSort, this.bufferSize, this.fragmentLimit);
   ExternalSort._copy(this.fileToSort, this.bufferSize, this.fragmentLimit,
-      this.fragments, this.orderedFile);
+      this.fragments, this.sortedFile);
 
   List<List<T>> sort() {
     validateParameters();
@@ -24,7 +25,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
     int unsortedFilePointer = bufferSize - 1;
     List<T> buffer = fileToSort.getRange(0, bufferSize).toList();
 
-    notifyObservers(ExternalSortTransition<T>.bufferFilled(
+    notifyObservers(SortTransition<T>.bufferFilled(
         fragments.map((e) => List.of(e)).toList(),
         List.of(buffer),
         unsortedFilePointer));
@@ -34,7 +35,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
         .mapIndexed((index, key) => IndexArrayEntry(key, index))
         .toList());
 
-    notifyObservers(ExternalSortTransition<T>.indexArrayBuilt(
+    notifyObservers(SortTransition<T>.indexArrayBuilt(
         fragments.map((e) => List.of(e)).toList(),
         List.of(buffer),
         unsortedFilePointer,
@@ -66,7 +67,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
           //Adds the key to the index array, checking to see if it needs to froze it
           addNewKeyToIndexArray(keyToAddToBuffer, entryToWrite, indexArray,
               bufferPositionToReplace);
-          notifyObservers(ExternalSortTransition<T>.replacedEntry(
+          notifyObservers(SortTransition<T>.replacedEntry(
               fragments.map((e) => List.of(e)).toList(),
               List.of(buffer),
               unsortedFilePointer,
@@ -83,7 +84,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
               0) {
             fragmentIndex++;
             fragments.add([]);
-            notifyObservers(ExternalSortTransition<T>.indexArrayFrozen(
+            notifyObservers(SortTransition<T>.indexArrayFrozen(
                 fragments.map((e) => List.of(e)).toList(),
                 List.of(buffer),
                 unsortedFilePointer,
@@ -92,7 +93,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
           }
           fragments[fragmentIndex].addAll(indexArray.removeRemainingKeys());
           buffer = [];
-          notifyObservers(ExternalSortTransition<T>.fileToSortEnded(
+          notifyObservers(SortTransition<T>.fileToSortEnded(
               fragments.map((e) => List.of(e)).toList()));
         }
       }
@@ -101,7 +102,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
         fragmentIndex++;
         indexArray.unfrozeAllEntries();
         fragments.add([]); //New fragment created
-        notifyObservers(ExternalSortTransition<T>.indexArrayFrozen(
+        notifyObservers(SortTransition<T>.indexArrayFrozen(
             fragments.map((e) => List.of(e)).toList(),
             List.of(buffer),
             unsortedFilePointer,
@@ -133,22 +134,37 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
   List<T> merge() {
     List<List<T>> currentFragments = List.from(fragments);
 
+    notifyObservers(MergeTransition<T>.mergeStarted(
+        currentFragments.map((e) => List.of(e)).toList()));
+
     while (currentFragments.length > 1) {
       List<List<T>> nextRuns = [];
       for (int i = 0; i < currentFragments.length; i += fragmentLimit) {
-        final batch = currentFragments.sublist(
-            i,
-            (i + fragmentLimit > currentFragments.length)
-                ? currentFragments.length
-                : i + fragmentLimit);
-        final mergedRun = MergeRun(batch).merge();
-        nextRuns.add(mergedRun);
+        var nextToProcess = (i + fragmentLimit > currentFragments.length)
+            ? currentFragments.length
+            : i + fragmentLimit;
+
+        var mergeRun =
+            MergeRun<T>(currentFragments, i, nextToProcess, nextRuns);
+
+        addObserversToMergeRun(mergeRun);
+        var mergeRunResult = mergeRun.merge();
+        removeObserversFromMergeRun(mergeRun);
+
+        nextRuns.add(mergeRunResult);
+
+        notifyObservers(MergeTransition<T>.nextRunsAdded(
+            currentFragments.map((e) => List.of(e)).toList(),
+            nextRuns.map((e) => List.of(e)).toList()));
       }
       currentFragments = nextRuns;
+      notifyObservers(MergeTransition<T>.mergeStarted(
+          currentFragments.map((e) => List.of(e)).toList()));
     }
 
-    orderedFile = currentFragments.isEmpty ? [] : currentFragments.first;
-    return orderedFile;
+    sortedFile = currentFragments.isEmpty ? [] : currentFragments.first;
+    notifyObservers(MergeTransition<T>.mergeFinished(List.of(sortedFile)));
+    return sortedFile;
   }
 
   void validateParameters() {
@@ -163,6 +179,69 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
 
   ExternalSort<T> clone() {
     return ExternalSort<T>._copy(
-        fileToSort, bufferSize, fragmentLimit, fragments, orderedFile);
+        fileToSort, bufferSize, fragmentLimit, fragments, sortedFile);
   }
+
+  void addObserversToMergeRun(MergeRun<T> mergeRun) {
+    for (var observer in observers) {
+      mergeRun.registerObserver(observer);
+    }
+  }
+
+  void removeObserversFromMergeRun(MergeRun<T> mergeRun) {
+    for (var observer in observers) {
+      mergeRun.removeObserver(observer);
+    }
+  }
+
+  /*List<T> mergeRun(List<List<T>> currentFragments, int batchStart,
+      int batchFinish, List<List<T>> nextRuns) {
+    final fragmentsToMerge = currentFragments.sublist(batchStart, batchFinish);
+    notifyObservers(MergeTransition<T>.batchSelected(
+        currentFragments.map((e) => List.of(e)).toList(),
+        fragmentsToMerge.map((e) => List.of(e)).toList(),
+        batchStart,
+        batchFinish,
+        nextRuns));
+
+    // Define a priority queue to always get the smallest element
+    final priorityQueue = PriorityQueue<QueueEntry<T>>();
+    final List<T> result = [];
+
+    // Initialize the priority queue with the first element of each fragment
+    for (int i = 0; i < fragmentsToMerge.length; i++) {
+      if (fragmentsToMerge[i].isNotEmpty) {
+        priorityQueue.add(QueueEntry<T>(fragmentsToMerge[i][0], i, 0));
+      }
+    }
+
+    notifyObservers(MergeTransition<T>.priorityQueueInitialized(
+        currentFragments.map((e) => List.of(e)).toList(),
+        fragmentsToMerge.map((e) => List.of(e)).toList(),
+        priorityQueue.toList(), []));
+
+    // Process the priority queue until it's empty.
+    while (priorityQueue.isNotEmpty) {
+      // Get the smallest element from the queue.
+      final smallestEntry = priorityQueue.removeFirst();
+      result.add(smallestEntry.value);
+
+      // Get the next element from the same fragment, if it exists
+      final nextIndex = smallestEntry.currentKeyPointer + 1;
+      if (nextIndex < fragmentsToMerge[smallestEntry.fragmentIndex].length) {
+        priorityQueue.add(QueueEntry<T>(
+            fragmentsToMerge[smallestEntry.fragmentIndex][nextIndex],
+            smallestEntry.fragmentIndex,
+            nextIndex));
+      }
+      notifyObservers(MergeTransition<T>.mergeRunResultAdded(
+          currentFragments.map((e) => List.of(e)).toList(),
+          fragmentsToMerge.map((e) => List.of(e)).toList(),
+          priorityQueue.toList(),
+          List.of(result)));
+    }
+    logger.debug(() => "Run result: $result");
+
+    return result;
+  }*/
 }

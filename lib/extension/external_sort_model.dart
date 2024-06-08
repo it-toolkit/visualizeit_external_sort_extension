@@ -17,6 +17,7 @@ class ExternalSortModel extends Model {
 
   List<num> get fileToSort => _externalSort.fileToSort;
   int get bufferSize => _externalSort.bufferSize;
+  int get fragmentLimit => _externalSort.fragmentLimit;
 
   ExternalSortModel(
       String name, int bufferSize, int fragmentLimit, List<int> fileToSort)

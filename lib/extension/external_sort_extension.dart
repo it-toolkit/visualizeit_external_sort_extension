@@ -1,4 +1,4 @@
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart';
 import 'package:visualizeit_extensions/common.dart';
 import 'package:visualizeit_extensions/extension.dart';
 import 'package:visualizeit_extensions/logging.dart';
@@ -40,12 +40,13 @@ class ExternalSortExtension extends DefaultScriptingExtension
           ExternalSortBuilderCommand.commandDefinition:
               ExternalSortBuilderCommand.build,
           SortCommand.commandDefinition: SortCommand.build,
+          MergeCommand.commandDefinition: MergeCommand.build,
         });
   @override
   Widget? render(Model model, BuildContext context) {
     if (model is ExternalSortModel) {
       return ExternalSortWidget(
-          model.fileToSort, model.bufferSize, model.currentTransition);
+            model.fileToSort, model.bufferSize, model.fragmentLimit, model.currentTransition);
     } else {
       return null;
     }

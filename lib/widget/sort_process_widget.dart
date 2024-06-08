@@ -5,7 +5,7 @@ import 'package:visualizeit_external_sort_extension/model/index_array.dart';
 import 'package:visualizeit_external_sort_extension/widget/colored_box.dart';
 
 class SortProcessWidget extends StatefulWidget {
-  final ExternalSortTransition<num>? _transition;
+  final SortTransition<num>? _transition;
   final int _bufferSize;
   final Map<num, Color> mapOfColors;
 
@@ -145,7 +145,11 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
 
   Widget indexArrayValueBuider(
       IndexArray<num>? indexArray, int index, int? bufferPositionToReplace) {
-    var maybeEntry = indexArray?.entries.elementAt(index);
+    IndexArrayEntry? maybeEntry;
+    if(indexArray!=null && index<indexArray.entries.length){
+      maybeEntry = indexArray.entries.elementAt(index);
+    }
+    
     var bufferPosition = maybeEntry?.bufferPosition;
     var key = maybeEntry?.key;
 

@@ -38,19 +38,21 @@ void main() {
     202
   ];
   var externalsort = ExternalSort<num>(valuesToSort, 5, 3);
+  externalsort.sort();
   var observer = ExternalSortObserver<num>();
   externalsort.registerObserver(observer);
-  externalsort.sort();
+  externalsort.merge();
 
-  runApp(MyApp(valuesToSort, externalsort.bufferSize, observer.transitions[21]));
+  runApp(MyApp(valuesToSort, externalsort.bufferSize, externalsort.fragmentLimit, observer.transitions[23]));
 }
 
 class MyApp extends StatelessWidget {
   final ExternalSortTransition<num> transition;
   final List<num> fileToSort;
   final int bufferSize;
+  final int fragmentLimit;
 
-  const MyApp(this.fileToSort, this.bufferSize, this.transition, {super.key});
+  const MyApp(this.fileToSort, this.bufferSize, this.fragmentLimit, this.transition,{super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: InteractiveViewer(
           clipBehavior: Clip.none,
-          child: ExternalSortWidget(fileToSort, bufferSize, transition),
+          child: ExternalSortWidget(fileToSort, bufferSize, fragmentLimit, transition),
         ),
       ),
     );

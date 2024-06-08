@@ -34,7 +34,7 @@ void main() {
     ];
     List<num> fragment3 = [62, 144, 202, 220, 414, 481];
 
-    var mergeRun = MergeRun<num>([fragment1, fragment2, fragment3]);
+    var mergeRun = MergeRun<num>([fragment1, fragment2, fragment3],0,3, []);
 
     var fragmentMerged = mergeRun.merge();
     expect(fragmentMerged.isSorted(), true);
@@ -48,7 +48,7 @@ void main() {
   test("merge with only one fragment", () {
     List<num> fragment1 = [410, 425, 427, 434, 446, 453];
 
-    var mergeRun = MergeRun<num>([fragment1]);
+    var mergeRun = MergeRun<num>([fragment1],0,1,[]);
 
     var fragmentMerged = mergeRun.merge();
 

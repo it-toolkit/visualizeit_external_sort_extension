@@ -52,7 +52,7 @@ class SortCommand extends ExternalSortCommand {
             modelName);
 
   SortCommand.build(RawCommand rawCommand)
-      : super(const Uuid().v4(), Logger("extension.externalsort.merge"), "");
+      : super(const Uuid().v4(), Logger("extension.externalsort.sort"), "");
 }
 
 class MergeCommand extends ExternalSortCommand {
@@ -62,4 +62,6 @@ class MergeCommand extends ExternalSortCommand {
   MergeCommand(String modelName)
     : super(const Uuid().v4(), Logger("extension.externalsort.merge"),
             modelName);
+  MergeCommand.build(RawCommand rawCommand)
+      : super(const Uuid().v4(), Logger("extension.externalsort.merge"), "");
 }
