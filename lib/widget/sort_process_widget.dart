@@ -294,18 +294,6 @@ class _SortProcessWidgetState extends State<SortProcessWidget> {
     var fragmentBox = ColoredValueBox(
         index, numToShow.toString(), widget.mapOfColors[numToShow]!);
 
-    /*return Container(
-      width: 40,
-      height: 40,
-      alignment: Alignment.topCenter,
-      child: ListTile(
-        titleAlignment: ListTileTitleAlignment.top,
-        contentPadding: EdgeInsets.zero,
-        minVerticalPadding: 0.0,
-        horizontalTitleGap: 0.0,
-        title: fragmentBox,
-      ),
-    );*/
     return Container(
       width: 40,
       height: 50,
