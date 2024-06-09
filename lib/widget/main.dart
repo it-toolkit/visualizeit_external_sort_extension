@@ -38,12 +38,13 @@ void main() {
     202
   ];
   var externalsort = ExternalSort<num>(valuesToSort, 5, 3);
-  externalsort.sort();
   var observer = ExternalSortObserver<num>();
   externalsort.registerObserver(observer);
-  externalsort.merge();
+  externalsort.sort();
+  
+  //externalsort.merge();
 
-  runApp(MyApp(valuesToSort, externalsort.bufferSize, externalsort.fragmentLimit, observer.transitions[23]));
+  runApp(MyApp(valuesToSort, externalsort.bufferSize, externalsort.fragmentLimit, observer.transitions[15]));
 }
 
 class MyApp extends StatelessWidget {

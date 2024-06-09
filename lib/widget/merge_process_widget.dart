@@ -84,7 +84,7 @@ class _MergeProcessWidgetState extends State<MergeProcessWidget> {
     List<Widget> fragmentsComponent = [];
 
     fragmentsComponent.add(Container(
-      margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      margin: const EdgeInsets.all(10),
       width: 105.0,
       alignment: Alignment.centerRight,
       child: Text(
@@ -169,7 +169,7 @@ class _MergeProcessWidgetState extends State<MergeProcessWidget> {
     List<Widget> fragmentsComponent = [];
 
     fragmentsComponent.add(Container(
-      margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      margin: const EdgeInsets.all(10.0),
       width: 105.0,
       alignment: Alignment.centerRight,
       child: Text(
