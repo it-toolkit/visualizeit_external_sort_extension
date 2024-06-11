@@ -28,7 +28,7 @@ class ExternalSortBuilderCommand extends ModelBuilderCommand {
             .toList();
 
   @override
-  Model call(CommandContext context) {
+  ExternalSortModel call(CommandContext context) {
     return ExternalSortModel("", bufferSize, fragmentLimit, fileToSort);
   }
 }
