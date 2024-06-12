@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:visualizeit_extensions/common.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_command.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_model.dart';
