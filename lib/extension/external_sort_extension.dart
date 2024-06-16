@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:visualizeit_extensions/common.dart';
 import 'package:visualizeit_extensions/extension.dart';
 import 'package:visualizeit_extensions/logging.dart';
-import 'package:visualizeit_extensions/scripting.dart';
-import 'package:visualizeit_extensions/visualizer.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_builder_command.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_command.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_model.dart';
 import 'package:visualizeit_external_sort_extension/widget/external_sort_widget.dart';
 
 final _logger = Logger("extension.externalsort");
+
+final class ExternalSortExtension extends Extension {
+  static const extensionId = "externalsort-extension";
+
+  ExternalSortExtension._create({required super.markdownDocs, required super.extensionCore}) : super.create(id: extensionId);
+}
 
 class ExternalSortExtensionBuilder extends ExtensionBuilder {
   static const _docsLocationPath =
@@ -19,23 +23,20 @@ class ExternalSortExtensionBuilder extends ExtensionBuilder {
   @override
   Future<Extension> build() async {
     _logger.trace(() => "Building External Sort extension");
-    var extension = ExternalSortExtension();
 
     final markdownDocs = {
       for (final languageCode in _availableDocsLanguages)
         languageCode: '$_docsLocationPath/$languageCode.md'
     };
 
-    return Extension(
-        ExternalSortExtension.extensionId, extension, extension, markdownDocs);
+    return ExternalSortExtension._create(markdownDocs: markdownDocs, extensionCore: ExternalSortExtensionCore());
   }
 }
 
-class ExternalSortExtension extends DefaultScriptingExtension
-    implements ScriptingExtension, VisualizerExtension {
+class ExternalSortExtensionCore extends SimpleExtensionCore {
   static const extensionId = "externalsort-extension";
 
-  ExternalSortExtension()
+  ExternalSortExtensionCore()
       : super({
           ExternalSortBuilderCommand.commandDefinition:
               ExternalSortBuilderCommand.build,
