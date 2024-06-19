@@ -45,8 +45,8 @@ void main() {
 
   testWidgets("test external sort", (tester) async {
     var extension = await extensionBuilder.build();
-    ScriptingExtension scriptingExtension = extension.scripting;
-    VisualizerExtension visualizerExtension = extension.visualizer;
+    Scripting scriptingExtension = extension.scripting;
+    Renderer rendererExtension = extension.renderer;
 
     ExternalSortBuilderCommand? createCommand = scriptingExtension
         .buildCommand(createRawCommand) as ExternalSortBuilderCommand?;
@@ -58,12 +58,12 @@ void main() {
     model = result.model as ExternalSortModel;
 
     var externalSortWidget =
-        visualizerExtension.render(model, buildContextMock);
+        rendererExtension.renderAll(model, buildContextMock);
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
       body: InteractiveViewer(
         clipBehavior: Clip.none,
-        child: externalSortWidget!,
+        child: externalSortWidget.elementAt(0),
       ),
     )));
 
@@ -79,8 +79,8 @@ void main() {
 
   testWidgets("test external merge", (tester) async {
     var extension = await extensionBuilder.build();
-    ScriptingExtension scriptingExtension = extension.scripting;
-    VisualizerExtension visualizerExtension = extension.visualizer;
+    Scripting scriptingExtension = extension.scripting;
+    Renderer rendererExtension = extension.renderer;
 
     ExternalSortBuilderCommand? createCommand = scriptingExtension
         .buildCommand(createRawCommand) as ExternalSortBuilderCommand?;
@@ -102,12 +102,12 @@ void main() {
     model = result.model as ExternalSortModel;
 
     var externalSortWidget =
-        visualizerExtension.render(model, buildContextMock);
+        rendererExtension.renderAll(model, buildContextMock);
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
       body: InteractiveViewer(
         clipBehavior: Clip.none,
-        child: externalSortWidget!,
+        child: externalSortWidget.elementAt(0),
       ),
     )));
 

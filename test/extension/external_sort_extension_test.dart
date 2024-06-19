@@ -16,8 +16,8 @@ class AnotherModelMock extends Mock implements Model {}
 
 class BuildContextMock extends Mock implements BuildContext {}
 
-void main() {
-  var extension = ExternalSortExtension();
+void main() async {
+  var extension = await ExternalSortExtensionBuilder().build();
   var externalSortModelMock = ExternalSortModelMock();
   var buildContextMock = BuildContextMock();
   var anotherModelMock = AnotherModelMock();
@@ -25,7 +25,7 @@ void main() {
   group("Extension tests - ", () {
     test("command definitions must be 3", () {
       expect(
-          extension.getAllCommandDefinitions(),
+          extension.scripting.getAllCommandDefinitions(),
           allOf(
               hasLength(3),
               containsAll([
@@ -41,7 +41,7 @@ void main() {
         3,
         ["1", "2", "3", "4"]
       ]);
-      var maybeCommand = extension.buildCommand(rawCommand);
+      var maybeCommand = extension.scripting.buildCommand(rawCommand);
       expect(maybeCommand, allOf(isNotNull, isA<ExternalSortBuilderCommand>()));
       var builderCommand = maybeCommand as ExternalSortBuilderCommand;
       expect(builderCommand.bufferSize, 5);
@@ -51,19 +51,19 @@ void main() {
 
     test("build external sort command", () {
       var rawCommand = RawCommand.withPositionalArgs("externalsort-sort", []);
-      var maybeCommand = extension.buildCommand(rawCommand);
+      var maybeCommand = extension.scripting.buildCommand(rawCommand);
       expect(maybeCommand, allOf(isNotNull, isA<SortCommand>()));
     });
 
     test("build external merge command", () {
       var rawCommand = RawCommand.withPositionalArgs("externalsort-merge", []);
-      var maybeCommand = extension.buildCommand(rawCommand);
+      var maybeCommand = extension.scripting.buildCommand(rawCommand);
       expect(maybeCommand, allOf(isNotNull, isA<MergeCommand>()));
     });
 
     test("non existent command", () {
       var rawCommand = RawCommand.literal("im-non-existent");
-      var maybeCommand = extension.buildCommand(rawCommand);
+      var maybeCommand = extension.scripting.buildCommand(rawCommand);
       expect(maybeCommand, isNull);
     });
 
@@ -72,12 +72,12 @@ void main() {
       when(()=>externalSortModelMock.bufferSize).thenReturn(3);
       when(()=>externalSortModelMock.fragmentLimit).thenReturn(3);
       when(()=>externalSortModelMock.fileToSort).thenReturn([11, 12, 13, 14]);
-      var maybeWidget = extension.render(externalSortModelMock, buildContextMock);
-      expect(maybeWidget, allOf(isNotNull, isA<ExternalSortWidget>()));
+      var maybeWidget = extension.renderer.renderAll(externalSortModelMock, buildContextMock);
+      expect(maybeWidget.elementAt(0), allOf(isNotNull, isA<ExternalSortWidget>()));
     }); 
 
     test("render another Model", () {
-      expect(extension.render(anotherModelMock, buildContextMock), isNull);
+      expect(extension.renderer.renderAll(anotherModelMock, buildContextMock), []);
     });
   });
 }
