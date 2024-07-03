@@ -2,6 +2,8 @@
 
 This is the External Sort extension usage doc.
 
+Extension id: `external_sort`
+
 ## Available commands
 
 ### externalsort-create
@@ -17,13 +19,13 @@ Must be used after the sort command. Executes the merge algorithm on the sorted 
 
 #### Usage example
 
-```
+```yaml
 name: "..."
 description: "..."
 tags: ["..."]
 scenes:
   - name: "..."
-    extensions: ['externalsort-extension']
+    extensions: ['external_sort']
     description: "..."
     initial-state:
       - externalsort-create: [5, 3, ["410","425","656","427","434","446","973","264","453","466","717","738","477","221","486","497","503","62","985","220","508","481"]]

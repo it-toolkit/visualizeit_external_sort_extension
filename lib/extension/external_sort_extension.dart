@@ -10,7 +10,7 @@ import 'package:visualizeit_external_sort_extension/widget/external_sort_widget.
 final _logger = Logger("extension.externalsort");
 
 final class ExternalSortExtension extends Extension {
-  static const extensionId = "externalsort-extension";
+  static const extensionId = "external_sort";
 
   ExternalSortExtension._create({required super.markdownDocs, required super.extensionCore}) : super.create(id: extensionId);
 }
@@ -34,7 +34,7 @@ class ExternalSortExtensionBuilder extends ExtensionBuilder {
 }
 
 class ExternalSortExtensionCore extends SimpleExtensionCore {
-  static const extensionId = "externalsort-extension";
+  static const extensionId = "external_sort";
 
   ExternalSortExtensionCore()
       : super({
