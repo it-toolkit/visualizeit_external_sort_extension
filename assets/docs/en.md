@@ -28,7 +28,12 @@ scenes:
     extensions: ['external_sort']
     description: "..."
     initial-state:
-      - externalsort-create: [5, 3, ["410","425","656","427","434","446","973","264","453","466","717","738","477","221","486","497","503","62","985","220","508","481"]]
+      - externalsort-create:
+          bufferSize: 5
+          fragmentLimit: 3
+          fileToSort: ["410", "425", "656", "427", "434", "446", "973", "264", "453",
+                       "466", "717", "738", "477", "221", "486", "497", "503", "62",
+                       "985", "220", "508", "481"]
     transitions:
       - externalsort-sort
       - externalsort-merge
