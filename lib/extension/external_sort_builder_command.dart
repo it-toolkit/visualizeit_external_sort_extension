@@ -8,7 +8,7 @@ class ExternalSortBuilderCommand extends ModelBuilderCommand {
       ExternalSortExtension.extensionId, "externalsort-create", [
     CommandArgDef("bufferSize", ArgType.int),
     CommandArgDef("fragmentLimit", ArgType.int),
-    CommandArgDef("fileToSort", ArgType.stringArray)
+    CommandArgDef("fileToSort", ArgType.intArray)
   ]);
 
   final List<int> fileToSort;
@@ -18,17 +18,19 @@ class ExternalSortBuilderCommand extends ModelBuilderCommand {
   ExternalSortBuilderCommand(
       this.bufferSize, this.fragmentLimit, this.fileToSort);
   ExternalSortBuilderCommand.build(RawCommand rawCommand)
-      : bufferSize =
-            commandDefinition.getArg(name: "bufferSize", from: rawCommand),
-        fragmentLimit =
-            commandDefinition.getArg(name: "fragmentLimit", from: rawCommand),
-        fileToSort = (commandDefinition.getArg(
-                name: "fileToSort", from: rawCommand) as List<String>)
-            .map(int.parse)
-            .toList();
+      : bufferSize = _getIntArgInRange(name: "bufferSize", from: rawCommand, min: 2, max: 30),
+        fragmentLimit =  _getIntArgInRange(name: "fragmentLimit", from: rawCommand, min: 2, max: 30),
+        fileToSort = (commandDefinition.getArg(name: "fileToSort", from: rawCommand) as List<int>);
 
   @override
   ExternalSortModel call(CommandContext context) {
     return ExternalSortModel("", bufferSize, fragmentLimit, fileToSort);
+  }
+
+  static _getIntArgInRange({required String name, required RawCommand from, required int min, required int max}) {
+    int value = commandDefinition.getArg(name: name, from: from);
+    if (value < min || value > max) throw Exception("Value must be in range [ $min , $max ]");
+
+    return value;
   }
 }
