@@ -11,6 +11,14 @@ Extension id: `external_sort`
 Creates the external sort, passing the buffer size for the sort algorithm(first argument), the amount of fragments that can be held in memory at the same time (second argument) and the unsorted file, represented
 by a list of keys
 
+#### Arguments
+
+| Name          | Type     | Position | Required | Default value | Description                |
+|---------------|----------|----------|----------|---------------|----------------------------|
+| bufferSize    | int      | 0        | true     | -             | Must be in range [ 2, 30 ] |
+| fragmentLimit | int      | 1        | true     | -             | Must be in range [ 2, 30 ] |
+| fileToSort    | intArray | 2        | true     | -             | -                          |
+
 ### externalsort-sort
 Executes the sort algorithm on the unsorted file, generating a list of sorted fragment
 
