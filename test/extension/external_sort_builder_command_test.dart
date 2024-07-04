@@ -23,6 +23,37 @@ void main() {
     expect(model.currentTransition, isNull);
   });
 
+  test("Buffer size limit Error less than min", () {
+    var rawCommand = RawCommand.withPositionalArgs("externalsort-create", [
+      1,
+      5,
+      ["1", "2", "3", "4"]
+    ]);
+
+    expect(
+        () => ExternalSortBuilderCommand.build(rawCommand),
+        throwsA(allOf(
+            isException,
+            predicate(
+                (e) => e.toString().contains("'bufferSize' must be in range")))));
+  });
+
+  test("Buffer size Error more than max", () {
+    var rawCommand = RawCommand.withPositionalArgs("externalsort-create", [
+      16,
+      5,
+      ["1", "2", "3", "4"]
+    ]);
+
+    expect(
+        () => ExternalSortBuilderCommand.build(rawCommand),
+        throwsA(allOf(
+            isException,
+            predicate(
+                (e) => e.toString().contains("'bufferSize' must be in range")))));
+  });
+
+
   test("Fragment limit Error less than min", () {
     var rawCommand = RawCommand.withPositionalArgs("externalsort-create", [
       3,
@@ -35,7 +66,7 @@ void main() {
         throwsA(allOf(
             isException,
             predicate(
-                (e) => e.toString().contains("Value must be in range")))));
+                (e) => e.toString().contains("'fragmentLimit' must be in range")))));
   });
 
   test("Fragment limit Error more than max", () {
@@ -50,7 +81,7 @@ void main() {
         throwsA(allOf(
             isException,
             predicate(
-                (e) => e.toString().contains("Value must be in range")))));
+                (e) => e.toString().contains("'fragmentLimit' must be in range")))));
   });
 
   test("File to sort size must be greater than buffer size", () {

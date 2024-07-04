@@ -1,5 +1,6 @@
 import 'package:visualizeit_extensions/common.dart';
 import 'package:visualizeit_extensions/scripting.dart';
+import 'package:visualizeit_extensions/scripting_extensions.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_extension.dart';
 import 'package:visualizeit_external_sort_extension/extension/external_sort_model.dart';
 
@@ -18,8 +19,8 @@ class ExternalSortBuilderCommand extends ModelBuilderCommand {
   ExternalSortBuilderCommand(
       this.bufferSize, this.fragmentLimit, this.fileToSort);
   ExternalSortBuilderCommand.build(RawCommand rawCommand){
-    bufferSize = _getIntArgInRange(name: "bufferSize", rawCommand: rawCommand, min: 2, max: 15);
-    fragmentLimit = _getIntArgInRange(name: "fragmentLimit", rawCommand: rawCommand, min: 2, max: 10);
+    bufferSize = commandDefinition.getIntArgInRange(name: "bufferSize", from: rawCommand, min: 2, max: 15);
+    fragmentLimit = commandDefinition.getIntArgInRange(name: "fragmentLimit", from: rawCommand, min: 2, max: 10);
     fileToSort = _validate(name: "fileToSort", rawCommand: rawCommand, bufferSize: bufferSize);
   }
 
@@ -28,13 +29,6 @@ class ExternalSortBuilderCommand extends ModelBuilderCommand {
     return ExternalSortModel("", bufferSize, fragmentLimit, fileToSort);
   }
 
-  static _getIntArgInRange({required String name, required RawCommand rawCommand, required int min, required int max}) {
-    int value = commandDefinition.getArg(name: name, from: rawCommand);
-    if (value < min || value > max) throw Exception("Value must be in range [ $min , $max ]");
-
-    return value;
-  }
-  
   static _validate({required String name, required RawCommand rawCommand, required int bufferSize}) {
     var fileToSort = commandDefinition.getArg(name: "fileToSort", from: rawCommand) as List<int>;
 
