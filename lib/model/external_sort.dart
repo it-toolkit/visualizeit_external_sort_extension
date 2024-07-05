@@ -48,17 +48,17 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
       //There's at least one unfrozen entry in the index array
       if (entryToWrite != null) {
         fragments[fragmentIndex].add(entryToWrite.key);
-        logger.debug(() => "wrote key to file: ${entryToWrite.key}");
+        logger.trace(() => "wrote key to file: ${entryToWrite.key}");
 
         // Check if the unsorted file still has keys to add to the buffer
         unsortedFilePointer++;
         if (unsortedFilePointer < fileToSort.length) {
           int bufferPositionToReplace = entryToWrite.bufferPosition;
-          logger.debug(
+          logger.trace(
               () => "buffer position to replace: $bufferPositionToReplace");
           //Gets a new key from the unsorted file
           var keyToAddToBuffer = fileToSort[unsortedFilePointer];
-          logger.debug(() => "new key to add to the buffer: $keyToAddToBuffer");
+          logger.trace(() => "new key to add to the buffer: $keyToAddToBuffer");
 
           //Replaces the entry in the buffer with the new key
           buffer[bufferPositionToReplace] = keyToAddToBuffer;
@@ -76,7 +76,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
         } else {
           //There's no more keys to sort, so we pass the remaining keys to a new fragment
           //If the last added to file is bigger than the first in the index array we need a new fragment
-          logger.debug(() => "Remaining entries: ${indexArray.entries}");
+          logger.trace(() => "Remaining entries: ${indexArray.entries}");
           if (fragments[fragmentIndex]
                   .last
                   .compareTo(indexArray.entries.first.key) >
@@ -119,7 +119,7 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
       IndexArray<dynamic> indexArray,
       int bufferPositionToReplace) {
     if (isKeyToAddLesserThanWroteKey(keyToAddToBuffer, entryToWrite.key)) {
-      logger.debug(() => "new key is lower than last key wrote to fragment");
+      logger.trace(() => "new key is lower than last key wrote to fragment");
       indexArray.addOrdered(keyToAddToBuffer, bufferPositionToReplace,
           isFrozen: true);
     } else {
@@ -192,55 +192,4 @@ class ExternalSort<T extends Comparable<T>> extends Observable {
       mergeRun.removeObserver(observer);
     }
   }
-
-  /*List<T> mergeRun(List<List<T>> currentFragments, int batchStart,
-      int batchFinish, List<List<T>> nextRuns) {
-    final fragmentsToMerge = currentFragments.sublist(batchStart, batchFinish);
-    notifyObservers(MergeTransition<T>.batchSelected(
-        currentFragments.map((e) => List.of(e)).toList(),
-        fragmentsToMerge.map((e) => List.of(e)).toList(),
-        batchStart,
-        batchFinish,
-        nextRuns));
-
-    // Define a priority queue to always get the smallest element
-    final priorityQueue = PriorityQueue<QueueEntry<T>>();
-    final List<T> result = [];
-
-    // Initialize the priority queue with the first element of each fragment
-    for (int i = 0; i < fragmentsToMerge.length; i++) {
-      if (fragmentsToMerge[i].isNotEmpty) {
-        priorityQueue.add(QueueEntry<T>(fragmentsToMerge[i][0], i, 0));
-      }
-    }
-
-    notifyObservers(MergeTransition<T>.priorityQueueInitialized(
-        currentFragments.map((e) => List.of(e)).toList(),
-        fragmentsToMerge.map((e) => List.of(e)).toList(),
-        priorityQueue.toList(), []));
-
-    // Process the priority queue until it's empty.
-    while (priorityQueue.isNotEmpty) {
-      // Get the smallest element from the queue.
-      final smallestEntry = priorityQueue.removeFirst();
-      result.add(smallestEntry.value);
-
-      // Get the next element from the same fragment, if it exists
-      final nextIndex = smallestEntry.currentKeyPointer + 1;
-      if (nextIndex < fragmentsToMerge[smallestEntry.fragmentIndex].length) {
-        priorityQueue.add(QueueEntry<T>(
-            fragmentsToMerge[smallestEntry.fragmentIndex][nextIndex],
-            smallestEntry.fragmentIndex,
-            nextIndex));
-      }
-      notifyObservers(MergeTransition<T>.mergeRunResultAdded(
-          currentFragments.map((e) => List.of(e)).toList(),
-          fragmentsToMerge.map((e) => List.of(e)).toList(),
-          priorityQueue.toList(),
-          List.of(result)));
-    }
-    logger.debug(() => "Run result: $result");
-
-    return result;
-  }*/
 }

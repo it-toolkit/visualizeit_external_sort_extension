@@ -20,7 +20,6 @@ class MergeProcessWidget extends StatefulWidget {
 class _MergeProcessWidgetState extends State<MergeProcessWidget> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 

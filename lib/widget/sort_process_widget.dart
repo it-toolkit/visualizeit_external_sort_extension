@@ -19,7 +19,6 @@ class SortProcessWidget extends StatefulWidget {
 class _SortProcessWidgetState extends State<SortProcessWidget> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 

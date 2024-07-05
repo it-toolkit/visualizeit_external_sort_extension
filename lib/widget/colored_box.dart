@@ -17,7 +17,6 @@ class _ColoredValueBoxState extends State<ColoredValueBox> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.delayed(const Duration(seconds: 0)).then((value) => setState(() {
           _highlighted = true;

@@ -67,7 +67,6 @@ class _UnsortedFileWidgetState extends State<UnsortedFileWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.unsortedFilePointer != null) {
         var position = widget.unsortedFilePointer!.toDouble();
-        //TODO mejorar esta logica
         if (position > 8.0) {
           _scrollController.animateTo(position * 25,
               duration: const Duration(milliseconds: 200),

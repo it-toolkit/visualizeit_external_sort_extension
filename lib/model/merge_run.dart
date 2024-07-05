@@ -66,7 +66,7 @@ class MergeRun<T extends Comparable<T>> extends Observable {
           _batchFinish,
           _nextRuns.map((e) => List.of(e)).toList()));
     }
-    logger.debug(() => "Run result: $result");
+    logger.trace(() => "Run result: $result");
 
     return result;
   }
