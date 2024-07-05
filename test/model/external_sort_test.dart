@@ -44,7 +44,6 @@ void main() {
 
       List<num> allFragmentsKey = [];
       for (var fragment in fragments) {
-        print(fragment);
         expect(fragment.isSorted(), true);
         allFragmentsKey.addAll(fragment);
       }
@@ -79,7 +78,6 @@ void main() {
 
       List<num> allFragmentsKey = [];
       for (var fragment in fragments) {
-        print(fragment);
         expect(fragment.isSorted(), true);
         allFragmentsKey.addAll(fragment);
       }
