@@ -1,3 +1,2 @@
 # visualizeit_external_sort_extension
-
-A new Flutter project.
+Implementation of an external sort algorithm, as an extension for Visualize IT
