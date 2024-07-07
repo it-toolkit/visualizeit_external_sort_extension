@@ -15,7 +15,7 @@ final class ExternalSortExtension extends Extension {
   ExternalSortExtension._create({required super.markdownDocs, required super.extensionCore}) : super.create(id: extensionId);
 }
 
-class ExternalSortExtensionBuilder extends ExtensionBuilder {
+class ExternalSortExtensionBuilder implements ExtensionBuilder {
   static const _docsLocationPath =
       "packages/visualizeit_external_sort_extension/assets/docs";
   static const _availableDocsLanguages = [LanguageCodes.en];
